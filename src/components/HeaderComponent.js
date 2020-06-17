@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-
 import { NavLink } from "react-router-dom";
 import { Navbar, NavbarBrand, Nav, NavbarToggler, Collapse, NavItem, Jumbotron,
     Button, Modal, ModalHeader, ModalBody,
     Form, FormGroup, Input, Label } from 'reactstrap';
 
 class Header extends Component {
-    constructor(props) {
+  // constructor  
+  constructor(props) {
         super(props);
-    
+    //binding
         this.toggleNav = this.toggleNav.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
@@ -18,25 +18,30 @@ class Header extends Component {
             isModalOpen: false
         };
         
-    }
+  }
+// add a new nav to the app 
     toggleNav() {
         this.setState({
           isNavOpen: !this.state.isNavOpen
         });
       }
-
+//add a new Modal to the application to host the form
       toggleModal() {
         this.setState({
           isModalOpen: !this.state.isModalOpen
         });
       }
+//to handle the form submission:
       handleLogin(event) {
         this.toggleModal();
         alert("Username: " + this.username.value + " Password: " + this.password.value
             + " Remember: " + this.remember.checked);
         event.preventDefault();
 
-    }
+     }
+
+//1.add a button to the Navbar to enable toggling the modal
+//2.add the form to the modal body 
     render() {
         return (
             <div>
@@ -97,32 +102,44 @@ class Header extends Component {
                         </div>
                     </div>
                 </Jumbotron>
-                <Form onSubmit={this.handleLogin}>
-                            <FormGroup>
-                                <Label htmlFor="username">Username</Label>
-                                <Input type="text" id="username" name="username"
-                                    innerRef={(input) => this.username = input} />
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="password">Password</Label>
-                                <Input type="password" id="password" name="password"
-                                    innerRef={(input) => this.password = input}  />
-                            </FormGroup>
-                            <FormGroup check>
-                                <Label check>
-                                    <Input type="checkbox" name="remember"
-                                    innerRef={(input) => this.remember = input}  />
-                                    Remember me
-                                </Label>
-                            </FormGroup>
-                            <Button type="submit" value="submit" color="primary">Login</Button>
-                        </Form>
                 <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
-                    <ModalHeader toggle={this.toggleModal}>Login</ModalHeader>
-                    <ModalBody>
-                    
-                    </ModalBody>
-                </Modal>
+          <ModalHeader toggle={this.toggleModal}>Login</ModalHeader>
+          <ModalBody>
+            <Form onSubmit={this.handleLogin}>
+              <FormGroup>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  type="text"
+                  id="username"
+                  name="username"
+                  innerRef={input => (this.username = input)}
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  type="password"
+                  id="password"
+                  name="password"
+                  innerRef={input => (this.password = input)}
+                />
+              </FormGroup>
+              <FormGroup check>
+                <Label check>
+                  <Input
+                    type="checkbox"
+                    name="remember"
+                    innerRef={input => (this.remember = input)}
+                  />
+                  Remember me
+                </Label>
+              </FormGroup>
+              <Button type="submit" value="submit" color="primary">
+                Login
+              </Button>
+            </Form>
+          </ModalBody>
+        </Modal>
             </div>
         );
     }

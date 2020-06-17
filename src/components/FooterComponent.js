@@ -1,6 +1,6 @@
 import React from "react";
 import {  Link} from "react-router-dom";
-
+//links to the other pages 
 function Footer(props) {
   return (
     <div className="footer">

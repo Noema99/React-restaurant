@@ -9,14 +9,15 @@ import {
   BreadcrumbItem
 } from "reactstrap";
 import { Link } from "react-router-dom";
-
+import { baseUrl } from '../shared/baseUrl';
 import { Loading } from './LoadingComponent';
 
+//to enable the information about the selected dish to be passed to the DishdetailComponent
 function RenderMenuItem ({dish}) {
   return (
       <Card>
           <Link to={`/menu/${dish.id}`} >
-              <CardImg width="100%" src={dish.image} alt={dish.name} />
+              <CardImg width="100%" src={baseUrl + dish.image} alt={dish.name} />
               <CardImgOverlay>
                   <CardTitle>{dish.name}</CardTitle>
               </CardImgOverlay>
@@ -24,7 +25,7 @@ function RenderMenuItem ({dish}) {
       </Card>
   );
 }
-
+// to render the menu item with conditions of fetching 
 const Menu = (props) => {
 
     const menu = props.dishes.dishes.map((dish) =>  {
@@ -33,30 +34,29 @@ const Menu = (props) => {
               <RenderMenuItem dish={dish}  />
           </div>
       );
-  });
-  if (props.dishes.isLoading) {
-    return(
-        <div className="container">
-            <div className="row">            
-                <Loading />
-            </div>
-        </div>
-    );
-}
-else if (props.dishes.errMess) {
-    return(
-        <div className="container">
-            <div className="row"> 
-                <div className="col-12">
-                    <h4>{props.dishes.errMess}</h4>
+    });
+     if (props.dishes.isLoading) {
+        return(
+            <div className="container">
+                <div className="row">            
+                    <Loading />
                 </div>
             </div>
-        </div>
-    );
-}
-else
-
-  return (
+        );
+    }
+    else if (props.dishes.errMess) {
+        return(
+            <div className="container">
+                <div className="row"> 
+                    <div className="col-12">
+                        <h4>{props.dishes.errMess}</h4>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    else
+     return (
     <div className="container">
         <div className="row">
             <Breadcrumb>

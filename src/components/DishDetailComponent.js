@@ -17,12 +17,14 @@ import {
 } from "reactstrap";
 import { Link } from "react-router-dom";
 import { Control, LocalForm, Errors } from "react-redux-form";
-
+import { baseUrl } from '../shared/baseUrl';
 import { Loading } from './LoadingComponent';
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
-const required = val => val && val.length;
-const maxLength = len => val => !val || val.length <= len;
-const minLength = len => val => val && val.length >= len;
+  //parameters conditions
+  const required = val => val && val.length;
+  const maxLength = len => val => !val || val.length <= len;
+  const minLength = len => val => val && val.length >= len;
 
 
 class  CommentForm  extends Component{
@@ -32,31 +34,35 @@ class  CommentForm  extends Component{
       isModalOpen: false
     };
     this.toggleModal = this.toggleModal.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
-
+// add new modal to the app to host the form
   toggleModal() {
     this.setState({
       isModalOpen: !this.state.isModalOpen
     });
   }
-
+ // to handle the values entered and submited and to show them in an alert
   handleSubmit(values) {
     this.toggleModal();
-    this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+    // initiate the action upon the user submitting the comment form
+    this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
   }
-render() {
+
+  // the comment form to fill out with the rating[1-5], the full name and the comment 
+  //this comment will be displayed with the others on the list of the dishe's comments
+  render() {
   return(
     <div>
-            <Button outline onClick={this.toggleModal}>
-              <span className="fa fa-pencil" /> Submit Comment
-            </Button>
-    <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
-      <ModalHeader toggle={this.toggleModal}>Submit Comment here </ModalHeader>
-      <ModalBody>
+      <Button outline onClick={this.toggleModal}>
+           <span className="fa fa-pencil" /> Submit Comment
+      </Button>
+      <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+        <ModalHeader toggle={this.toggleModal}>Submit Comment here </ModalHeader>
+        <ModalBody>
           <LocalForm onSubmit={this.handleSubmit}>
                           <Row className="form-group">
                                         <Label htmlFor="rating" md={4}>Rating</Label>
-                                       
                                          <Col md={{ size: 3 }}>
                                             <Control.select
                                               model=".rating"
@@ -105,55 +111,63 @@ render() {
                                     Send Feedback
                                     </Button>
                                
-                            </LocalForm>
-                            </ModalBody>
-        </Modal>
-       
-     </div>
+          </LocalForm>
+        </ModalBody>
+      </Modal>
+    </div>
   );
 }}
 
+// function that render the dish image, name, description and price in a card 
 function RenderDish({ dish }) {
   return (
     <div className="col-12 col-md-5 m-1">
-      <Card>
-        <CardImg top src={dish.image} alt={dish.name} />
-        <CardBody>
-          <CardTitle>{dish.name}</CardTitle>
-          <CardText>{dish.description}</CardText>
-          <CardText>Price : {dish.price}</CardText>
-        </CardBody>
-      </Card>
+        <FadeTransform
+                in
+                transformProps={{
+                    exitTransform: 'scale(0.5) translateY(-50%)'
+                }}>
+            <Card>
+                <CardImg top src={baseUrl + dish.image} alt={dish.name} />
+                <CardBody>
+                    <CardTitle>{dish.name}</CardTitle>
+                    <CardText>{dish.description}</CardText>
+                    <CardText>{dish.price}</CardText>
+                </CardBody>
+            </Card>
+         </FadeTransform>
     </div>
   );
-  }
+}
 
-function RenderComments({comments, addComment, dishId}) {
+//function that render with animation ( using stagger and fade) the dish's comments, thein authors and the date
+//to print out the date for a comment in a format more suitable for human readability 
+function RenderComments({comments, postComment, dishId}) {
   if (comments != null) {
     return (
       <div className="col-12 col-md-5 m-1">
         <h4>Comments</h4>
-        {comments.map(comment => (
-          <ul key={comment.id} className="list-unstyled">
-            <li className="mb-2">{comment.comment}</li>
-            <li>
-              -- {comment.author}{" "}
-              {new Intl.DateTimeFormat("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "2-digit"
-              }).format(new Date(Date.parse(comment.date)))}
-            </li>
-            
-          </ul>
-          
-        ))}
-          <CommentForm dishId={dishId} addComment={addComment} />
+        <Stagger in>
+                        {comments.map((comment) => {
+                            return (
+                                <Fade in>
+                                <li key={comment.id}>
+                                <p>{comment.comment}</p>
+                                
+                                <p>-- {comment.author} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))}</p>
+                                </li>
+                                </Fade>
+                            );
+                        })}
+         </Stagger>
+         <CommentForm dishId={dishId} postComment={postComment} />
       </div>
     );
   } else return <div />;
 }
-
+// fetching dishes' details from redux store with steps 
+//loarding while fetching the details and send them to the client side
+//error message if there's an error on the net, or a problem in communication client-serveur
 const DishDetail = (props) => {
   if (props.isLoading) {
     return (

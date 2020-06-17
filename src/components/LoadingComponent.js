@@ -1,5 +1,6 @@
 import React from 'react';
 
+//display a loading message
 export const Loading = () => {
     return(
         <div className="col-12">
